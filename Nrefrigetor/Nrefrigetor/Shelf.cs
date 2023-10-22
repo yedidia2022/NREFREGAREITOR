@@ -10,35 +10,42 @@ using System.Xml;
 
 namespace mekarer
 {
-    internal class Shelf  /*IEquatable<Item>, IComparable<Item>*/
+    internal class Shelf  
     {
         private int shelfId;
         private int floorNum;
-        private List<Item> items;
+        private List<Item> items = new List<Item>();
         private double shelfSizeOnSMR;
 
         public int ShelfId { get; private set; }
-        public int  FloorNum { get; set; }
+        public int  FloorNum { get;   private set; }
+        public void setFloorNUm(int numF,Refrigerator r)
+        {
+            if (numF > 0)
+                if (numF == r.getShelvesList().Count) 
+                {
+                    this.FloorNum = numF;
+                }
+        }
 
-        public double ShelfSizeOnSMR { get; set; }
+        public double ShelfSizeOnSMR { get { return shelfSizeOnSMR; } set { if (value > 0) shelfSizeOnSMR = value; } }
         public Shelf(double SMR)
         {
-            this.shelfId = IdGenrator.giveIdHash();
-            this.shelfSizeOnSMR = SMR;
-            List<Item> items=new List<Item>();
+            this.shelfId = IdGenrator.giveId(); 
+            this.ShelfSizeOnSMR = SMR;
+           
         }
         public List<Item> getMyList()
         {
             return items;
         }
-        
-        //האם להקצאות בבנאי את רשימת המוצרים
-        //או רק בפונקציה ואז לראות אם אפשר ואם כן אולי כדאי לעשות משתנה נוסף שיסכם את כמות הסמר
-        //התפוסים בשביל לא להצטרך לספור בכל פעם מחדש
+
         public bool addItem(Item item)
-        {// הלבטתי האם לשנות ישר בסמר בכל הוספת או הסרת מוצר ואז בפונקציה שבודקת כמות המקום הפנוי פשוט תקח ממשתנה גודל המדף או שזה לא תואם את האפיון שנתנו לי
-            if (this.placewasLeft() + item.PlaceOnSMR <= this.shelfSizeOnSMR) {
-                item.SetFloorNum(this.floorNum);
+        {
+            if (this.placewasLeft() - item.PlaceOnSMR >= 0)
+            {
+                item.SetFloorNum(this.floorNum, this);
+                items.Add(item);
                 return true;
             }
             else
@@ -46,29 +53,41 @@ namespace mekarer
                 Console.WriteLine("we dont have place for this item");
                 return false;
             }
-            //להוריד פה מהמקום ולוהסיף למערך. ואלי להקצות מערך אם י=עדין לא קיים
-
         }
 
         public override string ToString()
         {
-            if (items.Count != 0)
+            string sn;
+            if (this.FloorNum == 0)
+                sn = "no floornum yet";
+            else
             {
-                string itemsToSring = "the item detelies is";
+                sn ="the floornum is "+ this.FloorNum.ToString();
+            }
+          
+            if (items!=null)
+                {
+                string itemsToSring = @"    the item detelies is  :";
                 foreach (Item item in items)
                 {
                     itemsToSring += item.ToString() + ",";
                 }
-
-
-                return this.shelfId + " " + this.floorNum + " " + this.shelfSizeOnSMR + " " + itemsToSring;
-            }
-            else { return this.shelfId + " " + this.floorNum + " " + this.shelfSizeOnSMR; }
+               
+               
+                return @" shelfid is " + this.shelfId  +" "+
+                    sn+ 
+                    "  the shelfOnSmr is "
+                    +this.shelfSizeOnSMR + " " +
+                    itemsToSring;
+                }
+            else
+              return
+                   "shelfid " +this.shelfId + " " + sn +"shelfOnSmr" +this.shelfSizeOnSMR;
         }
-        //אולי כדאי לעשות מחלקת חישוב ששם יהיה בצורה ויטואלית ופה ידרסו אך מצד שני בכל מקום זה כ"כ שונה כי אני נגשת למוצר אחר.
+       
         public double placewasLeft()
         {
-            if (items.Count == 0)
+            if (items==null)
             {
                 return ShelfSizeOnSMR;
             }
@@ -80,28 +99,17 @@ namespace mekarer
             return this.shelfSizeOnSMR - places;
         }
 
-        //public Boolean isThisItemInThisShelf(int idnum)
-        //{
-        //    if (items.Count == 0)
-        //        return false;
-        //    //return items.Contains(new Item (){ itemId = idnum,Name="" });
-
-        //    foreach (Item item in items)
-        //    {
-        //        if (item.ItemId == idnum)
-        //            return true;
-        //    }
-        //    return false;
-        //}
+      
+        
         public Item takeOutItem(int itemid)
-        {    if(items.Count == 0)
+        {    if(items==null)
             { return null; }
             foreach (Item item in items)
             {
                 if (item.ItemId == itemid)
                 {
                     items.Remove(item);
-                    Console.WriteLine("we remove the item from floor: {0}", this.FloorNum);
+                    Console.WriteLine("we remove the item from floor:/n {0}", this.FloorNum);
                     return item;
                 }
 
@@ -114,42 +122,26 @@ namespace mekarer
         {
             
             int countsElement=items.Count;
-                if (items.Count != 0) { 
+                if (items !=null) { 
                     for (int i = 0; i < countsElement; i++)
                 {
-                   
+                    Console.WriteLine(items[i].ToString());
                     //יכולתי פה לשלוח לפונקציה שמוציאה מוצר
                     //אך זה סתם בזבוז כי פהאני כבר יודעת באיזה מוצר ואין לי צורך לחפשו
                     if (items[i].isExpired()) 
                     {
+                        Console.WriteLine("we remove this item", items[i].ToString());
                         this.items.Remove(items[i]);
                         countsElement--;
                     }
-                }//יכול להיות שצריך פה רשימת עזר שתאסוף את כל הדפוקים ואז נעשה removeAll או פונקציה אחרת שמורידה רשימה מרשימה
+                }
             }
         }
-        //public double itemAreExpired()
-        //{ double smr = 0;
-        //    if (items.Count!= 0)
-        //    {
-        //        foreach (Item item in items)
-        //        {
-        //            //יכולתי פה לשלוח לפונקציה שמוציאה מוצר
-        //            //אך זה סתם בזבוז כי פהאני כבר יודעת באיזה מוצר ואין לי צורך לחפשו
-        //            if (!item.isExpired())
-        //            { 
-        //                this.items.Remove(item);
-        //               smr+= item.PlaceOnSMR;
-        //            }
 
-        //        }
-        //        return smr;
-        //    } return smr;
-        //} 
         public List<Item> findItemsByKashrut(Kashruiot kashrut, Kinds kind)
         {
             List<Item> itemsBySpecificKushrut = new List<Item>();
-            if (items.Count == 0)
+            if (items == null)
                 return itemsBySpecificKushrut;
             else
             {
@@ -168,30 +160,11 @@ namespace mekarer
 
 
         }
-        //פונקציות מיון 
-        //public int SortByNameAscending(DateTime name1, DateTime name2)
-        //{
-
-        //    return name1.CompareTo(name2);
-        //}
-        // לא מכיר את this
-        //public int CompareTo(Item item)
-        //{
-        //    // A null value means that this object is greater.
-        //    if (item == null)
-        //        return 1;
-
-        //    else
-        //        return this.LastDayUse.CompareTo(item.LastDayUse);
-        //}
         public List<Item> sortByDate()
         {
-            // items.Sort();
+           
             List<Item> SortedList = items.OrderBy(o => o.LastDayUse).ToList();
-            foreach (Item item in SortedList)
-            {
-                Console.WriteLine(item);
-            }
+            
             return SortedList;
         }
 
