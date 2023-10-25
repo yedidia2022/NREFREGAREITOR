@@ -13,7 +13,7 @@ namespace mekarer
         private DateTime lastDayUse;
         private Kinds kind;
         private Kashruiot kashrut;
-        private double placeOnSMR;
+        private double placeOnCM;
         //אולי לשנות שמכיל מדף 
         private int floorNum;
         public int ItemId { get; set; }
@@ -21,7 +21,7 @@ namespace mekarer
         public DateTime LastDayUse { get {  return lastDayUse; } set { if(value >DateTime.Today) lastDayUse = value; } }
         public Kinds Kind { get { return kind; } set { kind = value; } }
         public Kashruiot Kashrut { get { return kashrut; } set { kashrut = value; } }
-        public double PlaceOnSMR { get {  return placeOnSMR; } set {  placeOnSMR = value; } }
+        public double PlaceOnCM{ get {  return placeOnSMR; } set {  placeOnSMR = value; } }
         public int FloorNum
         {
             get { return floorNum; }
@@ -42,30 +42,24 @@ namespace mekarer
             this.LastDayUse=date;
             this.kind = kind;
             this.Kashrut = kashrut;
-            this.PlaceOnSMR = SMR;
+            this.PlaceOnCM = SMR;
         }
         public override string ToString()
         {
             return "@item name : "+this.Name + " " +
                 "   kashrut :"+ this.Kashrut + " "+
                 " kind :" + this.Kind + " " +
-                "  placeonSMR  :"+ this.PlaceOnSMR + " " +
+                "  placeonSMR  :"+ this.PlaceOnCM + " " +
                 this.LastDayUse + " " +"itemid :"+ this.ItemId;
         }
         //לכאורה יכולתי לגשת ממחלקת מדף ולבדוק בגט תאריך האם גדוך מהיום אך למען הסדר עשיתי פה
         public Boolean isExpired()
         {
 
-            if (this.LastDayUse > DateTime.Now)
-            {
-                return true;
-            }
-            else
-            {   
-                return false;
-            }
-            
-          
+            return this.LastDayUse > DateTime.Now;
+
+
+
         }
         
 

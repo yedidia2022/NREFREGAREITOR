@@ -78,7 +78,7 @@ namespace mekarer
             if (count-1 < amountOfShelves)
             {
                 shelves.Add(shelf);
-                shelf.setFloorNUm(count, this);
+                shelf.setFloorNum(count, this);
 
             }
             else
@@ -110,7 +110,7 @@ namespace mekarer
 
                   foreach (Shelf shelf in shelves)
                   {
-                    if (shelf.placewasLeft() >= item.PlaceOnSMR) 
+                    if (shelf.placewasLeft() >= item.PlaceOnCM) 
                     {//הוספה ישירות כי אין צורך לשלוח לפונקציה שבודקת
                     item.SetFloorNum(shelf.FloorNum,shelf);
                         shelf.getMyList().Add(item);
@@ -214,7 +214,7 @@ namespace mekarer
 
 
 
-        public double CalcSMRbyCriterion(Kashruiot kashrut,DateTime dateExpired,Boolean b,double howmuchSMR)
+        public double CalcSMRbyCriterion(Kashruiot kashrut,DateTime dateExpired,Boolean flagRemove,double howmuchSMR)
         {
             double sumSMR = 0;
             
@@ -222,8 +222,8 @@ namespace mekarer
                 List <Item> items = new List<Item>();
                 int countItems= items.Count;
                 for (int i = 0;i< countItems; i++) { 
-                    if (items[i].LastDayUse< dateExpired && items[i].Kashrut == kashrut && b == false) { 
-                        sumSMR += items[i].PlaceOnSMR;
+                    if (items[i].LastDayUse< dateExpired && items[i].Kashrut == kashrut && flagRemove == false) { 
+                        sumSMR += items[i].PlaceOnCM;
                         howmuchSMR -= sumSMR;
                         if (howmuchSMR == 0)
                             return sumSMR;
@@ -232,8 +232,8 @@ namespace mekarer
                     }
                     else
                     {
-                        if (items[i].LastDayUse == dateExpired && items[i].Kashrut == kashrut && b == true) { 
-                            sumSMR += items[i].PlaceOnSMR;
+                        if (items[i].LastDayUse <dateExpired && items[i].Kashrut == kashrut && flagRemove == true) { 
+                            sumSMR += items[i].PlaceOnCM;
                             items.Remove(items[i]);
                             Console.Write(items[i]);
                             countItems--;

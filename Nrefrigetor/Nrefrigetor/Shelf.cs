@@ -15,11 +15,11 @@ namespace mekarer
         private int shelfId;
         private int floorNum;
         private List<Item> items = new List<Item>();
-        private double shelfSizeOnSMR;
+        private double shelfSizeOnCM;
 
         public int ShelfId { get; private set; }
         public int  FloorNum { get;   private set; }
-        public void setFloorNUm(int numF,Refrigerator r)
+        public void setFloorNum(int numF,Refrigerator r)
         {
             if (numF > 0)
                 if (numF == r.getShelvesList().Count) 
@@ -28,7 +28,7 @@ namespace mekarer
                 }
         }
 
-        public double ShelfSizeOnSMR { get { return shelfSizeOnSMR; } set { if (value > 0) shelfSizeOnSMR = value; } }
+        public double ShelfSizeOnCM { get { return shelfSizeOnSMR; } set { if (value > 0) shelfSizeOnSMR = value; } }
         public Shelf(double SMR)
         {
             this.shelfId = IdGenrator.giveId(); 
@@ -82,21 +82,21 @@ namespace mekarer
                 }
             else
               return
-                   "shelfid " +this.shelfId + " " + sn +"shelfOnSmr" +this.shelfSizeOnSMR;
+                   "shelfid " +this.shelfId + " " + sn +"shelfOnSmr" +this.shelfSizeOn;
         }
        
         public double placewasLeft()
         {
             if (items==null)
             {
-                return ShelfSizeOnSMR;
+                return ShelfSizeOnCM;
             }
             double places = 0;
             foreach (Item item in items)
             {
                 places += item.PlaceOnSMR;
             }
-            return this.shelfSizeOnSMR - places;
+            return this.shelfSizeOnCM - places;
         }
 
       
@@ -149,7 +149,7 @@ namespace mekarer
                 //נראה שצריך דלגייט והתחלתי להסתבך עם זה
                 foreach (Item item in items)
                 {
-                    if (item.Kashrut == kashrut && item.Kind == kind && item.isExpired())
+                    if (item.Kashrut == kashrut && item.Kind == kind && !(item.isExpired()))
                         itemsBySpecificKushrut.Add(item);
                 }
                 return itemsBySpecificKushrut;
